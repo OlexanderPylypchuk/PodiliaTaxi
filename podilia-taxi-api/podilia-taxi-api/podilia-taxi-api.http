@@ -1,0 +1,6 @@
+@podilia_taxi_api_HostAddress = http://localhost:5185
+
+GET {{podilia_taxi_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
