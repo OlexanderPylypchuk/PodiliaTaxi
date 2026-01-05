@@ -13,6 +13,7 @@ namespace podilia_taxi_api.DbContext
         public DbSet<User> Users { get; set; }
         public DbSet<Ride> Rides { get; set; }
         public DbSet<RideOrder> RideOrders { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
