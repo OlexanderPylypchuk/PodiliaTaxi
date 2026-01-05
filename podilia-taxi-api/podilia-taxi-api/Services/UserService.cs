@@ -12,7 +12,7 @@ namespace podilia_taxi_api.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<TokenDto> RefreshAccessToken(User user)
+        public async Task<TokenDto> RefreshAccessToken(UserDto user, string refreshTokenHash)
         {
             // Logic to generate and return a new access token for the user
             return "new_access_token";
