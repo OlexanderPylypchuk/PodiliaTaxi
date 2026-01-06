@@ -10,11 +10,9 @@ namespace podilia_taxi_api.DbContext.Repository
         {
             _context = context;
         }
-        public async Task<RefreshToken> Update(RefreshToken entity)
+        public async Task UpdateAsync(RefreshToken entity)
         {
             _context.RefreshTokens.Update(entity);
-            await _context.SaveChangesAsync();
-            return entity;
         }
     }
 }

@@ -6,6 +6,8 @@
         IRideRepository Rides { get; }
         IRideOrderRepository RideOrders { get; }
 
+        IRefreshTokenRepository RefreshTokens { get; }
 
+        Task SaveChangesAsync();
     }
 }

@@ -16,11 +16,9 @@ namespace podilia_taxi_api.DbContext.Repository
             _dbSet = _context.Set<T>();
         }
 
-        public async Task<T> Add(T entity)
+        public async Task Add(T entity)
         {
             await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
-            return entity;
         }
 
         public async Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null, int? pageSize = 10, int? pageNumber = 0, string? includeProperties = null, bool? allowDeleted = false)
@@ -81,7 +79,6 @@ namespace podilia_taxi_api.DbContext.Repository
         public async Task Remove(T entity)
         {
             _dbSet.Remove(entity);
-            await _context.SaveChangesAsync();
         }
     }
 }

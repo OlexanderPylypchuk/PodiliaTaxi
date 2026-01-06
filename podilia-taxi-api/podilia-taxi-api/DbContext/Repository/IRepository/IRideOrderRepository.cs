@@ -4,6 +4,6 @@ namespace podilia_taxi_api.DbContext.Repository.IRepository
 {
     public interface IRideOrderRepository : IRepository<RideOrder>
     {
-        Task<RideOrder> UpdateAsync(RideOrder entity);
+        Task UpdateAsync(RideOrder entity);
     }
 }
