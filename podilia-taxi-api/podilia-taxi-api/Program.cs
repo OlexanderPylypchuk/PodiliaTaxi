@@ -4,6 +4,7 @@ using podilia_taxi_api.DbContext;
 using podilia_taxi_api.DbContext.Repository;
 using podilia_taxi_api.DbContext.Repository.IRepository;
 using podilia_taxi_api.Models;
+using podilia_taxi_api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,9 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<HashService>();
 
 
 builder.Services.AddEndpointsApiExplorer();
