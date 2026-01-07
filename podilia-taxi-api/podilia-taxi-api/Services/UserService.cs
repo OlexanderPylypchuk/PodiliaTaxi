@@ -70,41 +70,40 @@ namespace podilia_taxi_api.Services
             };
         }
 
-        public async Task<User> Register(UserDto userDto)
+        public async Task<User> Register(RegistrationDto registrationDto)
         {
-            if (userDto == null)
+            if (registrationDto == null)
             {
                 throw new ArgumentNullException("Input is null");
             }
 
-            var existingUser = await _unitOfWork.Users.GetSingle(
-                u => u.UserName == userDto.UserName || u.Email == userDto.Email);
+            var existingUser = await _unitOfWork.Users.GetSingle(u => u.Email == registrationDto.Email);
 
             if (existingUser != null)
             {
                 throw new InvalidOperationException("User with the same username or email already exists.");
             }
 
-            if(userDto.Password == null)
+            if(registrationDto.Password == null)
             {
                 throw new ArgumentNullException("Password is null");
             }
 
-            if(userDto.Phone == null)
+            if(registrationDto.Phone == null)
             {
                 throw new ArgumentNullException("Phone is null");
             }
 
             var user = new User
             {
-                UserName = userDto.UserName,
-                Email = userDto.Email,
-                PhoneNumber = userDto.Phone,
+                UserName = registrationDto.Email,
+                Email = registrationDto.Email,
+                PhoneNumber = registrationDto.Phone,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };
 
-            IdentityResult result = await _userManager.CreateAsync(user, userDto.Password);
+            IdentityResult result = await _userManager.CreateAsync(user, registrationDto.Password);
 
             if (!result.Succeeded)
             {
@@ -115,7 +114,7 @@ namespace podilia_taxi_api.Services
             await EnsureRolesExist();
 
             // Role assignment — server controlled
-            var role = userDto.Role == SD.Role_Driver
+            var role = registrationDto.Role == SD.Role_Driver
                 ? SD.Role_Driver
                 : SD.Role_Customer;
 
