@@ -1,9 +1,12 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using podilia_taxi_api.DbContext;
 using podilia_taxi_api.DbContext.Repository;
 using podilia_taxi_api.DbContext.Repository.IRepository;
 using podilia_taxi_api.Models;
+using podilia_taxi_api.Models.Dtos;
 using podilia_taxi_api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +18,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.CreateMap<UserDto, User>().ReverseMap();
+}, AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
