@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using podilia_taxi_api.Models;
+using System.Reflection.Emit;
 
 namespace podilia_taxi_api.DbContext
 {
@@ -11,6 +12,7 @@ namespace podilia_taxi_api.DbContext
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
         public DbSet<Ride> Rides { get; set; }
         public DbSet<RideOrder> RideOrders { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -18,6 +20,22 @@ namespace podilia_taxi_api.DbContext
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<Rating>(entity =>
+            {
+                entity.HasKey(r => new { r.RaterId, r.RatedId });
+
+                entity.HasOne(r => r.Rater)
+                    .WithMany(u => u.GivenRatings)
+                    .HasForeignKey(r => r.RaterId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(r => r.Rated)
+                    .WithMany(u => u.ReceivedRatings)
+                    .HasForeignKey(r => r.RatedId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

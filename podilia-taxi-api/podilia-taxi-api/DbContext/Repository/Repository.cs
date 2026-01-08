@@ -24,26 +24,26 @@ namespace podilia_taxi_api.DbContext.Repository
         public async Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null, int? pageSize = 10, int? pageNumber = 0, string? includeProperties = null, bool? allowDeleted = false)
         {
             var query = _dbSet.AsQueryable();
-            
-            if(filter != null)
+
+            if (filter != null)
             {
                 query = query.Where(filter);
             }
 
-            if(pageSize != null)
+            if (pageSize != null)
             {
                 query = query.Skip(pageSize.Value * pageNumber.Value).Take(pageSize.Value);
             }
 
-            if(includeProperties != null)
+            if (includeProperties != null)
             {
-                foreach(var includeProperty in includeProperties.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(includeProperty);
                 }
             }
 
-            if(allowDeleted == false && typeof(IBaseEntity).IsAssignableFrom(typeof(T)))
+            if (allowDeleted == false && typeof(IBaseEntity).IsAssignableFrom(typeof(T)))
             {
                 query = query.Where(e => EF.Property<DateTime?>(e, nameof(IBaseEntity.DeletedAt)) != null);
             }
@@ -79,6 +79,20 @@ namespace podilia_taxi_api.DbContext.Repository
         public async Task Remove(T entity)
         {
             _dbSet.Remove(entity);
+        }
+
+        public async Task<bool> Exists(Expression<Func<T, bool>> filter, bool? allowDeleted = false)
+        {
+            var query = _dbSet.AsQueryable();
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            if (allowDeleted == false && typeof(IBaseEntity).IsAssignableFrom(typeof(T)))
+            {
+                query = query.Where(e => EF.Property<DateTime?>(e, nameof(IBaseEntity.DeletedAt)) != null);
+            }
+            return await query.AnyAsync();
         }
     }
 }

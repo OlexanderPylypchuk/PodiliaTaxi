@@ -18,6 +18,8 @@ namespace podilia_taxi_api.Models
         public List<RefreshToken> RefreshTokens { get; set; } 
         [NotMapped]
         public string Role { get; set; }
+        public IEnumerable<Rating> GivenRatings { get; set; } = new List<Rating>();
+        public IEnumerable<Rating> ReceivedRatings { get; set; } = new List<Rating>();
 
         public bool CanAuthenticate()
         {

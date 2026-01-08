@@ -16,10 +16,11 @@ namespace podilia_taxi_api.Services
         private readonly HashService _hashService;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly List<string> roles = new List<string> { SD.Role_Admin, SD.Role_Customer, SD.Role_Driver };
         public UserService(IUnitOfWork unitOfWork, TokenService tokenService, 
             HashService hashService, UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+            RoleManager<IdentityRole> roleManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _tokenService = tokenService;
@@ -27,6 +28,7 @@ namespace podilia_taxi_api.Services
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<TokenDto> Login(LoginDto loginDto)
@@ -165,6 +167,8 @@ namespace podilia_taxi_api.Services
 
             await EnsureRolesExist();
 
+            await _userManager.RemoveFromRolesAsync(user, roles);
+
             await _userManager.AddToRoleAsync(user, userDto.Role);
 
             return true;
@@ -225,6 +229,67 @@ namespace podilia_taxi_api.Services
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshTokenValue
             };
+        }
+
+        public async Task RateUser(RatingDto ratingDto)
+        {
+            if (ratingDto == null)
+            {
+                throw new ArgumentNullException("Input is null");
+            }
+
+            if (ratingDto.Score < 1 || ratingDto.Score > 5)
+            {
+                throw new ArgumentOutOfRangeException(nameof(ratingDto.Score),
+                    "Score must be between 1 and 5.");
+            }
+            var raterId = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(raterId))
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            if (raterId == ratingDto.RatedId)
+            {
+                throw new InvalidOperationException("User cannot rate themselves.");
+            }
+
+            var existingRating = await _unitOfWork.Ratings.GetSingle(r =>
+                r.RaterId == raterId &&
+                r.RatedId == ratingDto.RatedId);
+
+            if (existingRating != null)
+            {
+                existingRating.Score = ratingDto.Score;
+                await _unitOfWork.SaveChangesAsync();
+                return;
+            }
+
+            var rater = await _unitOfWork.Users.GetSingle(u => u.Id == raterId);
+            var rated = await _unitOfWork.Users.GetSingle(u => u.Id == ratingDto.RatedId);
+
+            if (rater == null || rated == null)
+            {
+                throw new InvalidOperationException("Rater or Ratee not found.");
+            }
+
+            var raterRole = (await _userManager.GetRolesAsync(rater)).FirstOrDefault();
+            var ratedRole = (await _userManager.GetRolesAsync(rated)).FirstOrDefault();
+
+            if (raterRole == ratedRole)
+            {
+                throw new InvalidOperationException("Rater and Ratee cannot have the same role.");
+            }
+
+            var rating = new Rating
+            {
+                RaterId = raterId,
+                RatedId = ratingDto.RatedId,
+                Score = ratingDto.Score,
+            };
+            await _unitOfWork.Ratings.Add(rating);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

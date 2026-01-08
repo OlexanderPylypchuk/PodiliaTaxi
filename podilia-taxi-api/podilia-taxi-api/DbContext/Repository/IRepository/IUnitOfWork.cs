@@ -5,7 +5,7 @@
         IUserRepository Users { get; }
         IRideRepository Rides { get; }
         IRideOrderRepository RideOrders { get; }
-
+        IRatingRepository Ratings { get; }
         IRefreshTokenRepository RefreshTokens { get; }
 
         Task SaveChangesAsync();

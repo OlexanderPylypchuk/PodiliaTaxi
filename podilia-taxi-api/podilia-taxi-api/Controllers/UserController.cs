@@ -69,5 +69,22 @@ namespace podilia_taxi_api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        [Authorize]
+        [Route("add-rating")]
+        public async Task<IActionResult> AddRating(RatingDto ratingDto)
+        {
+            try
+            {
+                var rating = _mapper.Map<Rating>(ratingDto);
+
+                return Ok("Rating added successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

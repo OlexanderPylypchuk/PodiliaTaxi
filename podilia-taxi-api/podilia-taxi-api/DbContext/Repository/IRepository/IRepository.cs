@@ -8,5 +8,6 @@ namespace podilia_taxi_api.DbContext.Repository.IRepository
         public Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null, int? pageSize = 10, int? pageNumber = 0, string? includeProperties = null, bool? allowDeleted = false);
         public Task Add(T entity);
         public Task Remove(T entity);
+        public Task<bool> Exists(Expression<Func<T, bool>> filter, bool? allowDeleted = false);
     }
 }

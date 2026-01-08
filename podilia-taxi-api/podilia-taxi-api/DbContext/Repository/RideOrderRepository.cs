@@ -11,11 +11,9 @@ namespace podilia_taxi_api.DbContext.Repository
         {
             _db = context;
         }
-        public async Task<RideOrder> UpdateAsync(RideOrder entity)
+        public async Task UpdateAsync(RideOrder entity)
         {
             _db.RideOrders.Update(entity);
-            await _db.SaveChangesAsync();
-            return entity;
         }
     }
 }
