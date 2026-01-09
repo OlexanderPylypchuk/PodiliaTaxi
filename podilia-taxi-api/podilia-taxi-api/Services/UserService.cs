@@ -282,6 +282,11 @@ namespace podilia_taxi_api.Services
                 throw new InvalidOperationException("Rater and Ratee cannot have the same role.");
             }
 
+            if(ratedRole != SD.Role_Driver && ratedRole != SD.Role_Customer)
+            {
+                throw new InvalidOperationException("Rated user must be a Driver or Customer.");
+            }
+
             var rating = new Rating
             {
                 RaterId = raterId,
